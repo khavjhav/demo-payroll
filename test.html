@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Earnings Calculator</title>
+    <link
+      rel="stylesheet"
+      href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 0;
+      }
+
+      #header {
+        background-color: #4caf50;
+        color: white;
+        padding: 20px;
+      }
+
+      #container {
+        display: flex;
+        justify-content: space-between;
+        max-width: 1200px;
+        margin: 20px auto;
+      }
+
+      .column {
+        flex-basis: 30%;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        text-align: left;
+        margin: 10px;
+      }
+
+      label {
+        font-weight: bold;
+        color: #4caf50;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      }
+
+      button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      }
+
+      hr {
+        border: 1px solid #ddd;
+      }
+
+      #monthlyProfit {
+        font-size: 24px;
+        font-weight: bold;
+        color: #4caf50;
+      }
+
+      table {
+        width: 100%;
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid #ddd;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: center;
+      }
+
+      th {
+        background-color: #4caf50;
+        color: white;
+      }
+
+       /* Style for the popup */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+
+    .popup-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <h1>Earnings Calculator</h1>
+    </div>
+
+    <div id="container">
+      <div class="column">
+        <h2>Clients and Earnings</h2>
+        <label for="numClients">Number of Clients: </label>
+        <input type="number" id="numClients" placeholder="5" /><br />
+        <div id="clientsInput"></div>
+        <hr />
+        <p>Total Earnings: $<span id="totalEarnings">0</span></p>
+      </div>
+
+      <div class="column">
+        <h2>Reductions</h2>
+        <h3>Employees</h3>
+        <label for="numEmployees">Number of Employees: </label>
+        <input type="number" id="numEmployees" placeholder="0" /><br />
+        <div id="employeesInput"></div>
+        <p>Total Employee Salary: $<span id="totalEmployeeSalary">0</span></p>
+        <hr />
+        <h3>Miscellaneous Costs</h3>
+        <label for="miscCost">Miscellaneous Costs ($): </label>
+        <input type="number" id="miscCost" placeholder="0" /><br />
+        <p>Total Miscellaneous Costs: $<span id="totalMiscCost">0</span></p>
+        <hr />
+        <p>Total Reductions: $<span id="totalReductions">0</span></p>
+      </div>
+
+      <div class="column">
+        <h2>Calculation and Net Profit</h2>
+        <label for="monthSelector">Select Month: </label>
+        <select id="monthSelector">
+          <option value="January">January</option>
+          <option value="February">February</option>
+          <option value="March">March</option>
+          <option value="April">April</option>
+          <option value="May">May</option>
+          <option value="June">June</option>
+          <option value="July">July</option>
+          <option value="August">August</option>
+          <option value="September">September</option>
+          <option value="October">October</option>
+          <option value="November">November</option>
+          <option value="December">December</option>
+
+          <!-- Add options for other months -->
+        </select>
+        <button onclick="saveData()">Save Data</button>
+        <hr />
+        <p id="monthlyProfit">Monthly Profit: $0</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Earnings</th>
+              <th>Reductions</th>
+              <th>Profit</th>
+            </tr>
+          </thead>
+          <tbody id="monthlyData">
+            <!-- Data for all 12 months will be inserted here -->
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>Total</td>
+              <td id="totalEarningsTable">0</td>
+              <td id="totalReductionsTable">0</td>
+              <td id="totalProfitTable">0</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+      <!-- Other body elements -->
+
+  <!-- Button to open the salary calculator popup -->
+  <button onclick="openSalaryCalculator()">Open Salary Calculator</button>
+
+  <!-- Salary calculator popup -->
+  <div class="popup" id="salaryCalculator">
+    <div class="popup-content">
+      <h2>Salary Calculator</h2>
+      <label for="monthlySalary">Monthly Salary ($):</label>
+      <input type="number" id="monthlySalary">
+      <label for="startDate">Start Date:</label>
+      <input type="date" id="startDate">
+      <label for="endDate">End Date:</label>
+      <input type="date" id="endDate">
+      <p>Prorated Salary: $<span id="proratedSalary">0</span></p>
+      <button onclick="calculateProratedSalary()">Calculate</button>
+      <button onclick="closeSalaryCalculator()">Close</button>
+    </div>
+  </div>
+
+    <script>
+      let monthlyData = {};
+
+      function addClientInputs() {
+        const numClients = parseInt(
+          document.getElementById("numClients").value
+        );
+        const clientsInput = document.getElementById("clientsInput");
+        clientsInput.innerHTML = "";
+        for (let i = 1; i <= numClients; i++) {
+          clientsInput.innerHTML += `
+          <label for="client${i}">Earnings for Client ${i} ($): </label>
+          <input type="number" id="client${i}" placeholder="0">
+          <label for="client${i}Percentage">Percentage (%): </label>
+          <input type="number" id="client${i}Percentage" placeholder="100"><br>
+        `;
+        }
+      }
+
+      function addEmployeeInputs() {
+        const numEmployees = parseInt(
+          document.getElementById("numEmployees").value
+        );
+        const employeesInput = document.getElementById("employeesInput");
+        employeesInput.innerHTML = "";
+        for (let i = 1; i <= numEmployees; i++) {
+          employeesInput.innerHTML += `
+          <label for="employee${i}">Salary for Employee ${i} ($): </label>
+          <input type="number" id="employee${i}" placeholder="0"><br>
+        `;
+        }
+      }
+
+      function saveData() {
+        const selectedMonth = document.getElementById("monthSelector").value;
+
+        if (!monthlyData[selectedMonth]) {
+          monthlyData[selectedMonth] = {};
+        }
+
+        const numClients = parseInt(
+          document.getElementById("numClients").value
+        );
+        let totalEarnings = 0;
+        for (let i = 1; i <= numClients; i++) {
+          const earnings = parseFloat(
+            document.getElementById(`client${i}`).value
+          );
+          const percentage = parseFloat(
+            document.getElementById(`client${i}Percentage`).value
+          );
+          totalEarnings += earnings * (percentage / 100);
+        }
+        document.getElementById("totalEarnings").textContent = totalEarnings;
+
+        const numEmployees = parseInt(
+          document.getElementById("numEmployees").value
+        );
+        let totalEmployeeSalary = 0;
+        for (let i = 1; i <= numEmployees; i++) {
+          totalEmployeeSalary += parseFloat(
+            document.getElementById(`employee${i}`).value
+          );
+        }
+        document.getElementById("totalEmployeeSalary").textContent =
+          totalEmployeeSalary;
+
+        const miscCost = parseFloat(document.getElementById("miscCost").value);
+        document.getElementById("totalMiscCost").textContent = miscCost;
+
+        const totalReductions = totalEmployeeSalary + miscCost;
+        document.getElementById("totalReductions").textContent =
+          totalReductions;
+
+        const monthlyProfit = totalEarnings - totalReductions;
+        document.getElementById(
+          "monthlyProfit"
+        ).textContent = `Monthly Profit: $${monthlyProfit}`;
+
+        monthlyData[selectedMonth] = {
+          totalEarnings,
+          totalEmployeeSalary,
+          miscCost,
+          totalReductions,
+          monthlyProfit,
+        };
+
+        updateTable();
+        console.log(`Data for ${selectedMonth} saved.`);
+      }
+
+      function updateTable() {
+        const table = document.getElementById("monthlyData");
+        table.innerHTML = "";
+
+        let totalEarningsTable = 0;
+        let totalReductionsTable = 0;
+        let totalProfitTable = 0;
+
+        for (const month in monthlyData) {
+          if (monthlyData.hasOwnProperty(month)) {
+            const data = monthlyData[month];
+            totalEarningsTable += data.totalEarnings;
+            totalReductionsTable += data.totalReductions;
+            totalProfitTable += data.monthlyProfit;
+            table.innerHTML += `
+            <tr>
+              <td>${month}</td>
+              <td>${data.totalEarnings}</td>
+              <td>${data.totalReductions}</td>
+              <td>${data.monthlyProfit}</td>
+            </tr>
+          `;
+          }
+        }
+
+        document.getElementById("totalEarningsTable").textContent =
+          totalEarningsTable;
+        document.getElementById("totalReductionsTable").textContent =
+          totalReductionsTable;
+        document.getElementById("totalProfitTable").textContent =
+          totalProfitTable;
+      }
+
+      $(function () {
+        $("#datepicker").datepicker({ dateFormat: "yy-mm" });
+      });
+
+      document
+        .getElementById("numClients")
+        .addEventListener("input", addClientInputs);
+      document
+        .getElementById("numEmployees")
+        .addEventListener("input", addEmployeeInputs);
+
+        // JavaScript functions for the salary calculator popup
+    function openSalaryCalculator() {
+      document.getElementById("salaryCalculator").style.display = "block";
+    }
+
+    function closeSalaryCalculator() {
+      document.getElementById("salaryCalculator").style.display = "none";
+    }
+
+    function calculateProratedSalary() {
+      const monthlySalary = parseFloat(document.getElementById("monthlySalary").value);
+      const startDate = new Date(document.getElementById("startDate").value);
+      const endDate = new Date(document.getElementById("endDate").value);
+
+      const totalDaysInMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
+      const daysWorked = (endDate - startDate) / (1000 * 60 * 60 * 24) + 1;
+      const dailyRate = monthlySalary / totalDaysInMonth;
+      const proratedSalary = dailyRate * daysWorked;
+
+      document.getElementById("proratedSalary").textContent = proratedSalary.toFixed(2);
+    }
+    </script>
+  </body>
+</html>
