@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Tracker</title>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+    #header {
+      background-color: #4caf50;
+      color: white;
+      padding: 20px;
+    }
+    #container {
+      display: flex;
+      justify-content: center; /* Center the columns */
+      flex-wrap: wrap; /* Allow columns to wrap if needed */
+      max-width: 1200px;
+      margin: 20px auto;
+    }
+    
+    .column {
+      flex: 0 0 30%; /* Set a base width for the columns */
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      text-align: left;
+      margin: 10px;
+    }
+    
+    label {
+      font-weight: bold;
+      color: #4caf50;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    button {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    .digital-clock {
+      font-size: 2em;
+      text-align: center;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    
+  </style>
+</head>
+<body>
+  <div id="header">
+    <h1>Attendance Tracker</h1>
+  </div>
+
+  <div id="container">
+    <div class="column" id="signInForm">
+      <h2>Sign In</h2>
+      <label for="name">Name:</label>
+      <input type="text" id="name" disabled>
+      <label for="todaysTask">Today's Task:</label>
+      <input type="text" id="todaysTask" disabled>
+      <label for="othersSignIn">Others:</label>
+      <input type="text" id="othersSignIn" disabled>
+      <button onclick="signIn()" disabled>Sign In</button>
+    </div>
+    
+    <div class="column" id="signOutForm">
+      <h2>Sign Out</h2>
+      <label for="nameOut">Name:</label>
+      <input type="text" id="nameOut" disabled>
+      <label for="accomplishedTask">Accomplished Task:</label>
+      <input type="text" id="accomplishedTask" disabled>
+      <label for="othersSignOut">Others:</label>
+      <input type="text" id="othersSignOut" disabled>
+      <button onclick="signOut()" disabled>Sign Out</button>
+    </div>
+    
+    <div class="column">
+      <div id="countdown" class="digital-clock">00:00:00</div>
+      <p id="countdownMessage"></p>
+    </div>
+  </div>
+  
+  <script>
+    $(function () {
+      const signInForm = $('#signInForm');
+      const signOutForm = $('#signOutForm');
+      const countdown = $('#countdown');
+      const countdownMessage = $('#countdownMessage');
+      
+      function updateFormsAndTimer() {
+        const now = new Date();
+        const bdt = new Date(now.getTime() + (6 * 60 * 60 * 1000));
+        const hours = bdt.getUTCHours();
+        let targetTime;
+
+        if (hours >= 18 && hours < 20) {
+          signInForm.show();
+          signOutForm.hide();
+          countdownMessage.text('');
+        } else if (hours >= 1 && hours < 17) {
+          signInForm.hide();
+          signOutForm.show();
+          countdownMessage.text('');
+        } else {
+          signInForm.hide();
+          signOutForm.hide();
+          if (hours < 1 || hours >= 5) {
+            countdownMessage.text('It is not yet time to sign in.');
+            targetTime = new Date(bdt);
+            targetTime.setUTCHours(18, 0, 0, 0);
+          } else {
+            countdownMessage.text('It is not yet time to sign out.');
+            targetTime = new Date(bdt);
+            targetTime.setUTCHours(1, 0, 0, 0);
+          }
+        }
+
+        if (targetTime) {
+          const timeDiff = targetTime - bdt;
+          if (timeDiff > 0) {
+            const hours = String(Math.floor(timeDiff / (1000 * 60 * 60))).padStart(2, '0');
+            const minutes = String(Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+            const seconds = String(Math.floor((timeDiff % (1000 * 60)) / 1000)).padStart(2, '0');
+            countdown.text(`${hours}:${minutes}:${seconds}`);
+          } else {
+            countdown.text('00:00:00');
+          }
+        }
+      }
+
+      updateFormsAndTimer();
+      setInterval(updateFormsAndTimer, 1000);
+    });
+
+    function signIn() {
+      const name = $('#name').val();
+      const todaysTask = $('#todaysTask').val();
+      const others = $('#othersSignIn').val();
+      // Here you can add the logic to save the sign in information to Firebase or any other database
+      alert('Sign In Successful!');
+    }
+
+    function signOut() {
+      const name = $('#nameOut').val();
+      const accomplishedTask = $('#accomplishedTask').val();
+      const others = $('#othersSignOut').val();
+      // Here you can add the logic to save the sign out information to Firebase or any other database
+      alert('Sign Out Successful!');
+    }
+  </script>
+</body>
+</html>
